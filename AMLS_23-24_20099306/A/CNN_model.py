@@ -63,7 +63,6 @@ class TaskA_CNN:
         self.model.add(Dense(1, activation ='sigmoid'))
 
 
-
     def train_CNN_model(self):
         
         #initialising the model
@@ -84,7 +83,7 @@ class TaskA_CNN:
             verbose=1
         )
 
-        self.model.save('A/taskA_pretrained_CNN_try.h5')
+        #self.model.save('A/taskA_pretrained_CNN_NEW.h5')
 
         # Plot training history (Accuracy)
         plt.figure(figsize=(12, 4))
@@ -157,7 +156,7 @@ class TaskA_CNN:
     def test_pre_trained_model(self):
 
         self.preprocessing()
-        self.model= load_model('A/taskA_pretrained_CNN_87%.h5')
+        self.model= load_model('A/taskA_pretrained_CNN.h5')
         self.model.summary()
 
         #Evaluate on validation set
@@ -170,17 +169,17 @@ class TaskA_CNN:
         #Accuracy and other metrics
         test_accuracy = accuracy_score(self.testing_labels, label_predicted.round())
         print(f'Test Accuracy: {test_accuracy}')
-        print(classification_report(self.testing_labels,label_predicted.round()))
+        print(classification_report(self.testing_labels, label_predicted.round()))
         
         # Confusion Matrix
         print('Confusion Matrix:')
         print(confusion_matrix(self.testing_labels, label_predicted.round()))       
         cm = confusion_matrix(self.testing_labels, label_predicted.round())
         plt.figure(figsize=(6, 6))
-        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False, annot_kws={"size": 14})
-        plt.title('Confusion Matrix')
-        plt.xlabel('Predicted')
-        plt.ylabel('True')
+        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=True, annot_kws={"size": 14})
+        plt.title('Confusion Matrix - CNN')
+        plt.xlabel('Predicted Labels')
+        plt.ylabel('True Labels')
         plt.show()
 
         # Calculate AUC score

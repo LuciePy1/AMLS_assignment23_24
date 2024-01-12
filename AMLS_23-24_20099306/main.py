@@ -41,28 +41,27 @@ def main():
             task_b_CNN.visualise_dataset()
 
         elif choice == '1':
-            # Call the method for training the model
-            # SVM no PCA
+            # TASK A - runs SVM no PCA
             task_a_SVM.train_SVM_model()
 
         elif choice == '2':
-            # SVM with PCA
+            # TASK A - runs SVM with PCA
             task_a_SVM.train_SVM_model_pca()
 
         elif choice == '3':
-            # CNN not trained
+            # TASK A - CNN not trained
             task_a_CNN.train_CNN_model()
 
         elif choice == '4':
-            # CNN pre trained
+            # TASK A - CNN pre trained
             task_a_CNN.test_pre_trained_model() #pretrained
 
         elif choice == '5':
-            # TASK B CNN not trained
+            # TASK B - CNN not trained
             task_b_CNN.train_CNN_model()
 
         elif choice == '6':
-            # CNN pre trained
+            # TASK B - CNN pre trained
             task_b_CNN.test_pre_trained_model() #pretrained
 
         elif choice == '7':

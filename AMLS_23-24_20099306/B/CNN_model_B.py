@@ -9,7 +9,7 @@ from keras.callbacks import EarlyStopping
 from keras.models import save_model, load_model
 from sklearn.metrics import confusion_matrix, classification_report,accuracy_score
 import seaborn as sns
-
+7
 class TaskB_CNN:
     #this function initilises the class instance and calls the load function
     def __init__(self, path):
@@ -50,7 +50,7 @@ class TaskB_CNN:
         plt.hist(all_labels_flat, bins=np.arange(num_classes + 1) - 0.5, rwidth=0.8, align='mid', color='pink', edgecolor='black')
         plt.xlabel('Class')
         plt.ylabel('Number of Images')
-        plt.title('Distribution of Labels in the Dataset')
+        plt.title('Distribution of Labels in the Dataset PathMNIST')
         plt.xticks(range(num_classes))
         plt.grid(axis='y', linestyle='--', alpha=0.7)
         plt.show()
@@ -120,7 +120,7 @@ class TaskB_CNN:
 
         history = self.model.fit(self.training_images, self.training_labels, epochs = 20, batch_size = 128, validation_data=(self.validation_images, self.validation_labels), verbose=1,  callbacks=[early_stopping])
 
-        self.model.save('B/taskB_pretrained_CNN_2.h5')
+        #self.model.save('B/taskB_pretrained_CNN_3.h5')
 
         # Plot training history (Accuracy)
         plt.figure(figsize=(12, 4))
@@ -175,7 +175,7 @@ class TaskB_CNN:
     def test_pre_trained_model(self):
 
         self.preprocessing()
-        self.model= load_model('B/taskB_pretrained_CNN_2 - Copie.h5')
+        self.model= load_model('B/taskB_pretrained_CNN_2.h5')
         self.model.summary()
 
         #Predict test set

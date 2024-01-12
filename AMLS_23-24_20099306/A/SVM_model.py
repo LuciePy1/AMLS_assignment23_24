@@ -9,6 +9,8 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils.class_weight import compute_class_weight
 from sklearn.metrics import roc_curve, auc
+import seaborn as sns
+
 
 
 class TaskA_SVM:
@@ -36,6 +38,7 @@ class TaskA_SVM:
         self.all_training_labels = np.concatenate([self.training_labels, self.validation_labels])
         self.testing_labels = pneumoniadataset['test_labels']
 
+    #this function allows to visualise the dataset
     def visualise_dataset(self):
         # Concatenate training and validation datasets for better visualization
         all_images = np.concatenate([self.training_images, self.validation_images])
@@ -60,20 +63,17 @@ class TaskA_SVM:
         plt.imshow(all_images[class_1_indices[random_index_1]], cmap='gray')
         plt.title('Class 1 (Pneumonia)')
 
-        # Display a bar graph showing the distribution of images per class
-        # Subplot for the bar graph
+        # Display bar graph showing the distribution of images per class
+        # Subplot for distirbution graph
         ax = plt.subplot(1, 3, 3)
         classes = ['0', '1']
         bars = ax.bar(classes, class_counts, color=['lightblue', 'lightblue'], edgecolor='black', linewidth=1)
-        # Add numbers on top of each bar
         for bar, count in zip(bars, class_counts):
             plt.text(bar.get_x() + bar.get_width() / 2 - 0.05, bar.get_height() + 20, str(count), ha='center', va='bottom', fontsize=10)
         ax.set_xlabel('Class')
         ax.set_ylabel('Number of Images')
         ax.set_title('Class Distribution')
-        # Remove y-axis ticks
         ax.tick_params(axis='y', which='both', left=False, labelleft = False)
-        # Remove the outside grid
         ax.spines['right'].set_visible(False)
         ax.spines['top'].set_visible(False)
         ax.spines['left'].set_visible(False)
@@ -96,8 +96,10 @@ class TaskA_SVM:
     def train_SVM_model(self):
         processed_training_images, processed_labels = self.preprocessing()
 
-        # Define the parameter grid to search
+        # Define the parameter grid to search - uncomment to run again
         # param_grid = {'C': [0.1, 1, 10, 100], 'kernel': ['rbf', 'sigmoid'], 'gamma': [0.001, 0.01, 0.1]}
+        
+        #ideal parameters 
         param_grid = {'C': [10], 'kernel': ['rbf'], 'gamma': [0.1]}
         
         # Create an SVM model
@@ -130,41 +132,29 @@ class TaskA_SVM:
         test_predictions = self.best_svm_model.predict(testing_images_normalized.reshape(len(testing_images_normalized), -1))
 
         # Evaluate accuracy
-        test_accuracy = accuracy_score(self.testing_labels, test_predictions)
+        test_accuracy = accuracy_score(self.testing_labels, test_predictions.round())
         print(f'Test Accuracy: {test_accuracy}')
 
         # Evaluate Precision, Recall, F-1 and 
         print('Classification Report:')
-        print(classification_report(self.testing_labels, test_predictions, zero_division = 1))
+        print(classification_report(self.testing_labels, test_predictions.round(), zero_division = 1))
 
         # Calculate AUC Score
-        fpr, tpr, thresholds = roc_curve(self.testing_labels, test_predictions)
+        fpr, tpr, thresholds = roc_curve(self.testing_labels, test_predictions, pos_label=1)
         roc_auc = auc(fpr, tpr)
         print(f'AUC on testing set: {roc_auc:.4f}')
 
-        # Plot ROC curve
-        plt.figure(figsize=(8, 8))
-        plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (AUC = {:.4f})'.format(roc_auc))
-        plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-        plt.xlabel('False Positive Rate')
-        plt.ylabel('True Positive Rate')
-        plt.title('Receiver Operating Characteristic (ROC) Curve')
-        plt.legend(loc='lower right')
+        # Confusion Matrix
+        print('Confusion Matrix:')
+        print(confusion_matrix(self.testing_labels, test_predictions.round()))       
+        cm = confusion_matrix(self.testing_labels, test_predictions.round())
+        plt.figure(figsize=(6, 6))
+        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=True, annot_kws={"size": 14})
+        plt.title('Confusion Matrix - SVM no PCA')
+        plt.xlabel('Predicted Labels')
+        plt.ylabel('True Labels')
         plt.show()
 
-        #print confusion matrix
-        print('Confusion Matrix:')
-        print(confusion_matrix(self.testing_labels, test_predictions))
-
-        # Plot Confusion Matrix
-        # plot_confusion_matrix(self.best_svm_model, testing_images_normalized.reshape(len(testing_images_normalized), -1), self.testing_labels, display_labels=['Class 0', 'Class 1'], cmap=plt.cm.Blues, normalize=None)
-        # plt.title('Confusion Matrix')
-        # plt.show()
-
-        # # # Plot ROC Curve wrong??
-        # plot_roc_curve(self.best_svm_model, testing_images_normalized.reshape(len(testing_images_normalized), -1), self.testing_labels)
-        # plt.title('ROC Curve')
-        # plt.show()
 
     def train_SVM_model_pca(self):
         # Normalize pixel values to the range [0, 1]
@@ -226,34 +216,16 @@ class TaskA_SVM:
         print(classification_report(self.testing_labels, test_predictions))
 
         print('Confusion Matrix:')
-        print(confusion_matrix(self.testing_labels, test_predictions))
-
-        # Plot Confusion Matrix
-        # plot_confusion_matrix(self.best_svm_model, normalized_testing_images_pca, self.testing_labels, display_labels=['Class 0', 'Class 1'], cmap=plt.cm.Blues, normalize=None)
-        # plt.title('Confusion Matrix')
-        # plt.show()
+        print(confusion_matrix(self.testing_labels, test_predictions.round()))       
+        cm = confusion_matrix(self.testing_labels, test_predictions.round())
+        plt.figure(figsize=(6, 6))
+        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=True, annot_kws={"size": 14})
+        plt.title('Confusion Matrix - SVM with PCA')
+        plt.xlabel('Predicted Labels')
+        plt.ylabel('True Labels')
+        plt.show()
 
         # Calculate AUC Score
         fpr, tpr, thresholds = roc_curve(self.testing_labels, test_predictions)
         roc_auc = auc(fpr, tpr)
         print(f'AUC on testing set: {roc_auc:.4f}')
-
-        # Plot ROC curve
-        plt.figure(figsize=(8, 8))
-        plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (AUC = {:.4f})'.format(roc_auc))
-        plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-        plt.xlabel('False Positive Rate')
-        plt.ylabel('True Positive Rate')
-        plt.title('Receiver Operating Characteristic (ROC) Curve')
-        plt.legend(loc='lower right')
-        plt.show()
-
-        # # Plot ROC Curve
-        # plot_roc_curve(self.best_svm_model, testing_images_normalized.reshape(len(testing_images_normalized), -1), self.testing_labels)
-        # plt.title('ROC Curve')
-
-        # # Calculate AUC Score
-        # auc_score = roc_auc_score(self.testing_labels, test_predictions)
-        # print(f'AUC Score: {auc_score}')
-
-        # plt.show()
