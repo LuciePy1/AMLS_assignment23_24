@@ -9,7 +9,7 @@ from keras.callbacks import EarlyStopping
 from keras.models import save_model, load_model
 from sklearn.metrics import confusion_matrix, classification_report,accuracy_score
 import seaborn as sns
-7
+
 class TaskB_CNN:
     #this function initilises the class instance and calls the load function
     def __init__(self, path):
